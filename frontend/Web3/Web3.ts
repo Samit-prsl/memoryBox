@@ -42,6 +42,26 @@ let walletAddress  = ''
     }
  }
 
+ const requestTransaction = async (amount:number,address:string,walletAddress:string) =>{
+    try {
+        const value = web3.utils.toWei(amount.toString(),'ether')
+        const Tx = {
+        from : walletAddress,
+        to : address,
+        gas : 5000,
+        value :value
+        }
+        await window.ethereum.request({
+        method : "eth_sendTransaction",
+        params : [Tx]
+    })
+    console.log("Payment request initiated")
+    
+    } catch (err) {
+        console.log(err)
+    }
+ }
+
 export default  {
-    setMetamaskWallet,setWalletAddressToWeb3,connectToSmartContract,contractInteraction
+    setMetamaskWallet,setWalletAddressToWeb3,connectToSmartContract,contractInteraction,requestTransaction
 }
