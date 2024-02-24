@@ -9,6 +9,7 @@ import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Burnable.sol";
 contract memoryNFT is ERC721, ERC721Enumerable, ERC721URIStorage, ERC721Burnable {
     uint256 private _nextTokenId;
     uint256 private MAX_MINT = 1000; 
+    uint256 private Cost;
 
 
     constructor(string memory _Name,string memory _Symbol)
@@ -26,21 +27,21 @@ contract memoryNFT is ERC721, ERC721Enumerable, ERC721URIStorage, ERC721Burnable
         _;
     }
 
-    function DynamicNftPricing(uint supply) internal view  returns (uint _cost) {
+    function DynamicNftPricing(uint supply) external {
         if(supply <50)
-            return 0.04 ether;
+            Cost = 0.00004 ether;
         if(supply < 100)
-            return 0.08 ether;
+            Cost =  0.00008 ether;
         if (supply <= MAX_MINT) 
-            return 0.1 ether;
+            Cost =  0.0001 ether;
         if (supply > MAX_MINT)
-            return 100 ether;
+            Cost = 100 ether;
     }
 
     function safeMint(address to, string memory uri) public payable RestrictionForMaxMinting {
         uint256 tokenId = _nextTokenId++;
         //uint256 supply = totalSupply();
-       // require(msg.value >= DynamicNftPricing(supply),"Not enough funds!");
+        require(msg.value >= Cost ,"Not enough funds!");
         User memory _user = User({
             _Count : tokenId
         });
