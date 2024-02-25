@@ -1,9 +1,7 @@
 import { useState } from "react";
-import pinataSDK from '@pinata/sdk'
 
 export default function Upload() {
 
-const pinata = new pinataSDK({pinataJWTKey:import.meta.env.VITE_PINATA_JWT!})
 
     const [selectedFile, setSelectedFile]: any = useState();
     const [cid, setCid]: any = useState();
@@ -55,14 +53,25 @@ const pinata = new pinataSDK({pinataJWTKey:import.meta.env.VITE_PINATA_JWT!})
 
     const metaData = {
         "Description" : description,
-        "imageURL" : `{import.meta.env.VITE_GATEWAY_URL}/ipfs/${cid}`,
+        "imageURL" : `${import.meta.env.VITE_GATEWAY_URL}/ipfs/${cid}`,
         "Author" : name
     }
 
+    //console.log(metaData.imageURL);
+    
+
    const submitMetadata = async() =>{
             try {
-                const Pinning = await pinata.pinJSONToIPFS(metaData)
-                console.log(Pinning);
+                const Pinning = await fetch('https://api.pinata.cloud/pinning/pinJSONToIPFS',{
+                  method : "POST",
+                  headers : {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${import.meta.env.VITE_PINATA_JWT}`,
+                  },
+                  body : JSON.stringify(metaData),
+                })
+                const PinningData = await Pinning.json()
+                console.log(PinningData.IpfsHash);  
             } catch (error) {
                 console.log(error)
             }
@@ -77,11 +86,6 @@ const pinata = new pinataSDK({pinataJWTKey:import.meta.env.VITE_PINATA_JWT!})
         <button onClick={handleSubmission}>Submit</button>
         <button onClick={submitMetadata}>Submit Metadata</button>
         
-        {/* {cid && (
-        <img
-          src={`${import.meta.env.VITE_GATEWAY_URL}/ipfs/${cid}`}
-          alt="ipfs image"
-        /> */}
       )
     </div>
   )
