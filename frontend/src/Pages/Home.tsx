@@ -2,29 +2,33 @@ import web3 from '../../Web3/Web3'
 
 export default function Home() {
 
+  const ContractAddress = "0x1C8946C8A0C6Bdac3a4fBe41717F263dF4479Ec6"
+
     const contractInteraction = async () =>{
-        const Contract = (await web3.contractInteraction("0x545f518126BFFDFF5Baa2dF69828D0E04a4cB355")).Contract
-        const walletAddress = (await web3.contractInteraction("0x545f518126BFFDFF5Baa2dF69828D0E04a4cB355")).walletAddress
+        const Contract = (await web3.contractInteraction(ContractAddress)).Contract
+        const walletAddress = (await web3.contractInteraction(ContractAddress)).walletAddress
         console.log(Contract.methods);
         console.log(walletAddress);
     }
 
     // const requestPayment = async ()=>{
 
-    //     const walletAddress = (await web3.contractInteraction("0x545f518126BFFDFF5Baa2dF69828D0E04a4cB355")).walletAddress
-    //     const Pay = await web3.requestTransaction(0.00004,'0x545f518126BFFDFF5Baa2dF69828D0E04a4cB355',walletAddress)
+    //     const walletAddress = (await web3.contractInteraction("0x27CdcBDf2409f83E89F59107EE65041ABcC8fBf8")).walletAddress
+    //     const Pay = await web3.requestTransaction(0.00004,'0x27CdcBDf2409f83E89F59107EE65041ABcC8fBf8',walletAddress)
     //     console.log(Pay);   
     // }
 
     const Mint = async (to:string,uri:string)=>{
-      const Contract = (await web3.contractInteraction("0x545f518126BFFDFF5Baa2dF69828D0E04a4cB355")).Contract
-      const walletAddress = (await web3.contractInteraction("0x545f518126BFFDFF5Baa2dF69828D0E04a4cB355")).walletAddress
+      const Contract = (await web3.contractInteraction(ContractAddress)).Contract
+      const walletAddress = (await web3.contractInteraction(ContractAddress)).walletAddress
       const Supply = await Contract.methods.totalSupply().call()
-      const requiredFunds:any = await Contract.methods.DynamicNftPricing(Supply).call()
-      console.log(requiredFunds);
+      //console.log(Supply);
       
-      const gas:any = await Contract.methods.safeMint(to, uri).estimateGas({ value: requiredFunds });
-      // const Pay = await web3.requestTransaction(requiredFunds,'0x545f518126BFFDFF5Baa2dF69828D0E04a4cB355',walletAddress)
+      const requiredFunds:any = await Contract.methods.DynamicNftPricing(Supply).call()
+      //console.log(requiredFunds);
+      
+     const gas:any = await Contract.methods.safeMint(to, uri).estimateGas({ value: requiredFunds });
+      // const Pay = await web3.requestTransaction(requiredFunds,ContractAddress,walletAddress)
       // console.log(Pay);
       const Minting = (await Contract.methods.safeMint(to,uri).send({value:requiredFunds,gas:gas,from:walletAddress}))
       console.log(Minting);

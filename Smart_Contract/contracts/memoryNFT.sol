@@ -27,15 +27,15 @@ contract memoryNFT is ERC721, ERC721Enumerable, ERC721URIStorage, ERC721Burnable
         _;
     }
 
-    function DynamicNftPricing(uint supply) external {
-        if(supply <50)
+    function DynamicNftPricing(uint supply) external returns(uint256 _Cost) {
+        if(supply >= 0 && supply <= 50)
             Cost = 0.00004 ether;
-        if(supply < 100)
+        else if(supply > 50 && supply <= MAX_MINT)
             Cost =  0.00008 ether;
-        if (supply <= MAX_MINT) 
-            Cost =  0.0001 ether;
-        if (supply > MAX_MINT)
+        else 
             Cost = 100 ether;
+
+        return Cost;
     }
 
     function safeMint(address to, string memory uri) public payable RestrictionForMaxMinting {
