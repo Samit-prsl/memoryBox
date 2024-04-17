@@ -6,5 +6,6 @@ route.post('/register', Controller.registerController)
 route.post('/login',Controller.loginController)
 route.post('/resetpassword',Controller.ResetPasswordController)
 route.post('/checkotp',Controller.checkOTP)
+route.put('/updatepassword',Controller.updatePassword)
 
 export default route
