@@ -35,12 +35,12 @@ export default function Home() {
       
     }
   return (
-    <div className=" h-screen flex justify-center items-center bg-slate-800">
+    <div className=" h-screen flex justify-center items-center bg-red-800">
      <div className=' flex-col justify-center items-center'>
-        <p className=" text-center font-mono text-purple-600 text-5xl my-3">This is Home page</p>
+        <p className=" text-center font-mono text-bg bg-green-600 text-5xl my-3">This is Home page</p>
         <div className=' flex justify-center items-center gap-8'>
-            <button className=' bg-green-700 hover:bg-green-950 px-5 py-3 text-black rounded-3xl' onClick={()=>{contractInteraction()}}>Interact</button>
-            <button className=' bg-green-700 hover:bg-green-950 px-5 py-3 text-black rounded-3xl' onClick={()=>{Mint("0xAe9409008ff373dc1E96D37aD921a2A76F49A847","https://amethyst-absent-whale-734.mypinata.cloud/ipfs/QmQZjpxKRd4axdDvUcfWxi3pjEvhWH8Edmu6WD3uxDBx35")}}>Pay</button>
+            <button className=' bg-blue-700 hover:bg-blue-950 px-5 py-3 text-black rounded-3xl' onClick={()=>{contractInteraction()}}>Interact</button>
+            <button className=' bg-blue-700 hover:bg-yellow-950 px-5 py-3 text-black rounded-3xl' onClick={()=>{Mint("0xAe9409008ff373dc1E96D37aD921a2A76F49A847","https://amethyst-absent-whale-734.mypinata.cloud/ipfs/QmQZjpxKRd4axdDvUcfWxi3pjEvhWH8Edmu6WD3uxDBx35")}}>Pay</button>
         </div>
      </div>
     </div>
