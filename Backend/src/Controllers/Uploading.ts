@@ -12,7 +12,7 @@ const uploadDataForNFTController = async(req:any,res:any)=>{
                 nft : '',
                 user : {
                     connect : {
-                        id : req.user
+                        id : req.user.id
                     }
                 }
             } as any
@@ -25,7 +25,18 @@ const uploadDataForNFTController = async(req:any,res:any)=>{
 
 const updateLinkinNFTController = async(req:any,res:any) =>{
     try {
-        
+        const {link} = req.body
+        const id  = req.params.id
+        const numberId = Number(id)
+        const updateUploads = await prisma.uploads.update({
+            where: {
+                id: numberId
+            } as any,
+            data: {
+                nft: link,
+            }
+        })
+        res.status(200).send(updateUploads)
     } catch (error) {
         console.log(error)
     }

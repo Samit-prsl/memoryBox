@@ -21,10 +21,11 @@ model User {
   uploads Uploads[]
 }
 model Uploads {
-  id      Int      @id @default(autoincrement())
+  id    Int      @id @default(autoincrement())
   avatar  String   @unique
   description String?
   pic String?
   nft String?
-  user   User   @relation(fields: [id], references: [id])
+  userId Int @default(3)
+  user   User   @relation(fields: [userId], references: [id])
 }
