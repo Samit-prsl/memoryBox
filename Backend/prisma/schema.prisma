@@ -18,4 +18,13 @@ model User {
   name    String?
   password String?
   otp String?
+  uploads Uploads[]
+}
+model Uploads {
+  id      Int      @id @default(autoincrement())
+  avatar  String   @unique
+  description String?
+  pic String?
+  nft String?
+  user   User   @relation(fields: [id], references: [id])
 }
