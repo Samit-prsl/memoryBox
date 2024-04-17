@@ -50,7 +50,7 @@ const loginController = async(req:any,res:any)=>{
         if(!passMatch)
             return res.status(401).send("Incorrect username or password!")
         const SECRET_KEY : any = process.env.SECRET_KEY
-        const token : string = jwt.sign({ username: isUser.email,role:"email" },SECRET_KEY , {
+        const token : string = jwt.sign({ email: isUser.email,role:"email",id:isUser.id },SECRET_KEY , {
             expiresIn : "24h" })
         res.status(200).json({token})        
     } catch (error) {
@@ -101,12 +101,14 @@ const checkOTP = async(req:any,res:any)=>{
 const updatePassword = async(req:any,res:any)=>{
     try {
          const {email,newPassword} = req.body
+         const salt : string = await bcrypt.genSalt(10)
+         const hashedPassword : any = await bcrypt.hash(newPassword,salt)
          const updateUser = await prisma.user.update({
             where: {
                 email: email,
             },
             data: {
-                password: newPassword,
+                password: hashedPassword,
             },
          })
          res.status(200).send(updateUser)
