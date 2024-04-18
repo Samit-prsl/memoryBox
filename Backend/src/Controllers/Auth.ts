@@ -117,5 +117,24 @@ const updatePassword = async(req:any,res:any)=>{
     }
 }
 
-export default {registerController,loginController,ResetPasswordController,checkOTP,updatePassword}
+const updateOTP = async(req:any,res:any)=>{
+    try {
+        const {email} = req.body
+        const randomOTP : string = `${Math.floor(100000 + Math.random() * 900000)}`
+        await Config.sendOTPForVerification(email,randomOTP)
+        const updateOtpForUser = await prisma.user.update({
+            where : {
+                email : email
+            },
+            data : {
+                otp : randomOTP
+            }
+        })
+        res.status(200).send(updateOtpForUser)
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+export default {registerController,loginController,ResetPasswordController,checkOTP,updatePassword,updateOTP}
 
