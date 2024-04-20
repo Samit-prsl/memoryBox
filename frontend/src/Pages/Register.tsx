@@ -18,6 +18,9 @@ export default function Register() {
                 <FcGoogle className="mr-2 h-4 w-4" /> Login with Gmail
             </Button>
         </div>
+        <div>
+            
+        </div>
     </div>
     </>
   )
