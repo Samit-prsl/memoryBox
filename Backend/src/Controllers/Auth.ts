@@ -76,8 +76,8 @@ const ResetPasswordController = async(req:any,res:any)=>{
 }
 
 const checkOTP = async(req:any,res:any)=>{
+    const {email,otp} = req.body
     try {
-        const {email,otp} = req.body
         const User : any = await prisma.user.findUnique({
             where :{
                 email : email
@@ -86,7 +86,7 @@ const checkOTP = async(req:any,res:any)=>{
         if(User && User?.otp === otp) 
             return res.status(200).send("OTP verification sucessfull")
         if(User && User?.otp != otp) {
-            res.status(200).send("OTP verification unsuccessfull")
+            res.status(404).send("OTP verification unsuccessfull otp wrong entered")
             return await prisma.user.deleteMany({
                 where:{
                     email : email
@@ -94,7 +94,14 @@ const checkOTP = async(req:any,res:any)=>{
             })
         }  
     } catch (error) {
+        //res.status(404).send(error)
         console.log(error);
+        
+        return await prisma.user.deleteMany({
+            where:{
+                email : email
+            }
+        })
     }
 }
 
