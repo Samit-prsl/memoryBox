@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import React,{ useState } from 'react'
 import { IoLogoWebComponent } from "react-icons/io5";
 import { FaEye } from "react-icons/fa";
 import { FaEyeSlash } from "react-icons/fa";
@@ -14,8 +14,21 @@ import {
     FormLabel,
     FormMessage,
   } from "@/Components/ui/form"
+  import {
+    Popover,
+    PopoverContent,
+    PopoverTrigger,
+  } from "@/Components/ui/popover"
+  import {
+    InputOTP,
+    InputOTPGroup,
+    InputOTPSeparator,
+    InputOTPSlot,
+  } from "@/Components/ui/input-otp"
   import { Input } from "@/Components/ui/input"
   import { GoogleLogin } from '@react-oauth/google';
+  import axios from 'axios'
+
 
   const formSchema = z.object({
     username: z.string().min(5, {
@@ -29,12 +42,17 @@ import {
     }),
   })
 
+
 export default function Register() {
 
     const [viewPassword,SetViewPassword] = useState<boolean>(false)
-    // const [email,Setemail] = useState<string>("")
+    const [email,Setemail] = useState<string>("")
     // const [name,Setname] = useState<string>("")
-     const [password,Setpassword] = useState<string>()
+     //const [password,Setpassword] = useState<string>()
+    const [value, setValue] = React.useState("")
+    const [click,Setclick] = useState<boolean>(false)
+    const [disableUpdateButton,SetdisableUpdateButton] = useState<boolean>(true)
+    const [counter,Setcounter] = useState<number>(60)
 
 
       const form = useForm<z.infer<typeof formSchema>>({
@@ -46,9 +64,66 @@ export default function Register() {
         },
       })
 
-      function onSubmit(data:any) {
-        console.log(data)
+      //let email:string
 
+      async function onSubmit(data:any) {
+        console.log(data)
+        Setclick(true)
+        startTimer()
+        Setemail(data.email)
+        try {
+          const Email = data.email
+          const password = data.password
+          const name = data.username
+          const response = await axios.post(`http://localhost:5000/auth/register`,{
+            email,name,password
+          })
+        console.log(response);
+        } catch (error) {
+          console.log(error);
+          Setclick(false)
+          alert("something went wrong!")
+        }
+      }
+      
+      console.log(email)
+      
+
+      function startTimer() {
+        const timer = setTimeout(()=>{
+          SetdisableUpdateButton(false)
+        },60000)
+        const interval = setInterval(() => {
+          //console.log(seconds);
+          Setcounter(prevcounter => prevcounter - 1)
+          //console.log(counter);
+        }, 1000);
+        //clearTimeout(timer)
+      }
+
+      async function onOTPSubmit(){
+        try {
+          const response = await axios.post('http://localhost:5000/auth/checkotp',{
+          email,value
+        })
+        console.log(response)
+        
+        } catch (error) {
+          console.log(error)
+        }
+      }
+
+      async function onOTPUpdate(){
+        startTimer()
+        try {
+          const response = await axios.put('http://localhost:5000/auth/updateotp',{
+          email
+        })
+        console.log(response)
+        alert("OTP has been resend!")
+        } catch (error) {
+          console.log(error)
+        }
       }
 
       function checkPasswordStrong(password:string){
@@ -59,7 +134,7 @@ export default function Register() {
 
   return (
     <>
-    <div className=' bg-gradient-to-r from-sky-200 to to-sky-400 min-h-screen p-8 flex flex-col justify-center items-center gap-5'>
+    <div className=' bg-gradient-to-r from-sky-200 to to-sky-400 h-screen p-8 flex flex-col justify-center items-center gap-5 overflow-y-hidden'>
         <div className=' h-full flex justify-center items-center'>
             <IoLogoWebComponent className=' text-center text-4xl'/>
         </div>
@@ -72,7 +147,7 @@ export default function Register() {
                 <GoogleLogin
                     onSuccess={credentialResponse => {
                         console.log(credentialResponse);
-                        window.location.replace('/')
+                        //window.location.replace('/')
                     }}
                     onError={() => {
                         console.log('Login Failed');
@@ -82,9 +157,9 @@ export default function Register() {
 
                 />
         </div>
-        <div className=' mb-5 w-[20%]'>
+        <div className=' mb-10 w-[20%]'>
                 <Form {...form}>
-                    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                    <form onSubmit={form.handleSubmit(onSubmit,onOTPSubmit)} className="space-y-4">
                     <FormField
                         control={form.control}
                         name="username"
@@ -92,7 +167,7 @@ export default function Register() {
                         <FormItem>
                             <FormLabel>Username</FormLabel>
                             <FormControl>
-                                <Input placeholder="username" {...field} className=' outline-none'/>
+                                <Input placeholder="username" {...field} className='  focus-visible:ring-0'/>
                             </FormControl>
                             <FormMessage />
                         </FormItem>
@@ -105,7 +180,7 @@ export default function Register() {
                         <FormItem>
                             <FormLabel>Email</FormLabel>
                             <FormControl>
-                                <Input placeholder="email@email.com" type='email' {...field} className=' outline-none'/>
+                                <Input placeholder="email@email.com" type='email' {...field} className='  focus-visible:ring-0'/>
                             </FormControl>
                             <FormMessage />
                         </FormItem>
@@ -120,7 +195,7 @@ export default function Register() {
                             <FormControl className='flex gap-2'>
                                 {/* <Input placeholder="shadcn" type='password' {...field} /> */}
                                 <div className="flex w-full max-w-sm items-center space-x-2 bg-white rounded-md">
-                                        <Input type={viewPassword ? ``:`password`} placeholder="password" {...field} className=' outline-none' />
+                                        <Input type={viewPassword ? ``:`password`} placeholder="password" {...field} className=' focus-visible:ring-0' />
                                         {
                                             viewPassword ?
                                                 <FaEye className=' text-4xl cursor-pointer pr-2' onClick={()=>SetViewPassword(!viewPassword)}/>
@@ -141,8 +216,48 @@ export default function Register() {
                         </FormItem>
                         )}
                         />
-               <div className=' h-full flex justify-center items-center mt-5'>
-                    <Button type="submit" >Signup</Button>
+               <div className=' h-full flex justify-center items-center'>
+                    {/* <Button type="submit" >Signup</Button> */}
+                    <Popover>
+                      <PopoverTrigger><Button type="submit" className={click ? `cursor-not-allowed `:`cursor-pointer`} disabled={click}>Signup</Button></PopoverTrigger>
+                      <PopoverContent className={` h-80 flex flex-col justify-center items-center bg-sky-600 text-black rounded-xl ${click ? `block`:`hidden`} pt-16`}>
+                        <div className="space-y-2">
+                              <InputOTP
+                                maxLength={6}
+                                value={value}
+                                onChange={(value:any) => setValue(value)}
+                              >
+                                <InputOTPGroup>
+                                  <InputOTPSlot index={0} />
+                                  <InputOTPSlot index={1} />
+                                  <InputOTPSlot index={2} />
+                                  <InputOTPSlot index={3} />
+                                  <InputOTPSlot index={4} />
+                                  <InputOTPSlot index={5} />
+                                </InputOTPGroup>
+                              </InputOTP>
+                              <div className="text-center text-sm">
+                                {value === "" ? (
+                                  <>Enter your one-time password sent to your email</>
+                                ) : (
+                                  <>You entered: {value}</>
+                                )}
+                              </div>
+                              <div className=' h-full flex justify-center items-center gap-4'>
+                                <Button onClick={()=>{onOTPSubmit()}}>Submit</Button>
+                                {
+                                  (counter>0) ?
+                                     (
+                                      <Button disabled={disableUpdateButton ? true:false}>Resend OTP after {counter}s</Button>
+                                  ) :
+                                  (
+                                    <Button disabled={disableUpdateButton ? true:false} onClick={()=>{onOTPUpdate()}}>Resend OTP</Button>
+                                  )
+                                }
+                              </div>
+                            </div>
+                      </PopoverContent>
+                    </Popover>
                </div>
       </form>
     </Form>
